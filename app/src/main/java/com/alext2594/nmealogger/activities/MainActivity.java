@@ -146,31 +146,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         logButton.setTextColor(Color.RED);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 0, this);
         locationManager.addNmeaListener(messageListener);
-        /*
-        locationManager.addNmeaListener(new OnNmeaMessageListener() {
-            @Override
-            public void onNmeaMessage(String message, long timestamp) {
-                //Log.d(TAG, "NMEA: " + nmea);
-                String[] nmea_array = message.split(",");
-                String messageID = nmea_array[0];
-                if(messageID.equals("$GPGGA")) {
-                    Log.d(TAG, message);
-
-                    File file = new File(getExternalFilesDir("NMEA_logger"), "sample.txt");
-                    FileOutputStream stream;
-                    try {
-                        stream = new FileOutputStream(file, true);
-                        stream.write(message.getBytes());
-                        stream.flush();
-                        stream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-        });
-        */
     }
 
     private void stopNMeaLogger() {
@@ -236,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-                                Log.d(TAG, response.getJSONObject("data").getString("message"));
+                                Log.d(TAG, response.getJSONObject("data")
+                                        .getString("message"));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
