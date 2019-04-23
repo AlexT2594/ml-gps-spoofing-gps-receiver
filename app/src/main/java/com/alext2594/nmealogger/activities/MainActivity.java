@@ -31,6 +31,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +40,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.security.KeyFactory;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -54,6 +58,18 @@ import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+
+import java.io.*;
+import java.nio.*;
+import java.security.*;
+import java.security.spec.*;
+
 public class MainActivity extends AppCompatActivity implements LocationListener{
 
     private static final String TAG = "NMEALogger";
@@ -64,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     Button logButton;
     StringBuilder NMEASentences;
     TextView nmeaPhraseTextView;
+    String jwtToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +106,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     getLocationPermission();
             }
         });
+
+
+        try{
+            byte[] keyBytes = IOUtils.toByteArray(getResources().openRawResource(R.raw.private_jwt_key));
+
+            PKCS8EncodedKeySpec spec =
+                    new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            PrivateKey key = kf.generatePrivate(spec);
+
+            jwtToken = Jwts.builder().setSubject("gps_receiver").signWith(key,SignatureAlgorithm.RS256).compact();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
 
     }
 
@@ -204,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
             AndroidNetworking.post("https://172.20.10.2:8000/raw_nmea_producer/produce_data")
                     .addHeaders("Content-Type", "application/json")
+                    .addHeaders("Authorization", jwtToken)
                     .addJSONObjectBody(wrapper)
                     .setOkHttpClient(getTrustingCertOkHttpClient(getApplicationContext()))
                     .build()
