@@ -1,21 +1,13 @@
 package com.alext2594.nmealogger.activities;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.IntentService;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Criteria;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.OnNmeaMessageListener;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -35,12 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -60,15 +47,8 @@ import okhttp3.OkHttpClient;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import java.security.Key;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 
-import java.io.*;
-import java.nio.*;
-import java.security.*;
-import java.security.spec.*;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
 
@@ -121,10 +101,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
     }
 
     @Override
@@ -187,18 +163,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         currentlyLogging = false;
         logButton.setTextColor(Color.BLACK);
         locationManager.removeUpdates(this);
-
-        File file = new File(getExternalFilesDir("NMEA_logger"), "sample2.txt");
-        FileOutputStream stream;
-        Log.d(TAG,NMEASentences.toString());
-        try {
-            stream = new FileOutputStream(file, true);
-            stream.write(NMEASentences.toString().getBytes());
-            stream.flush();
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
